@@ -1,0 +1,12 @@
+# large data stays out of git
+data/raw/
+data/work/
+data/previews/
+*.h5
+*.part
+*.tmp.tif
+# python / notebooks
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.env
