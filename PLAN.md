@@ -22,7 +22,12 @@ Done on 3 Nov:
   - Mask codes: 0 = invalid (partially focused), 1..N = valid (sub-swath number), 255 = outside. L 20 Jun: 3.9% of the grid is 0. S 18 Oct: no 0s.
   - Terms: L dual-pol = HHHH, HVHV only. **S-band dual-pol also has complex HHHV.**
   - Precision: L-band covariance terms are stored with 16 mantissa bits. S-band terms use all 23.
-  - **S-band "sample shift" flag.** `inputDataExceptionMask` = 64 ("NISAR SSAR sample shift") on 36% of the 18 Oct valid swath. Check co-registration and radiometry inside vs. outside it (next step 3).
+  - **S-band "sample shift" flag.** `inputDataExceptionMask` = 64 ("NISAR SSAR sample shift") on 36% of the 18 Oct valid swath.
+  - **L–S co-registration, 18 Oct (same joint pass)**, by sub-pixel phase correlation of HH dB in 10 km windows:
+    - Outside the flag (257 windows): median offset 0.00 px in x and y, IQR ±0.05 px (±1 m).
+    - Inside the flag (141 windows): −0.05 px (1 m) in x.
+    - So the S-band pixel-centre reading is right, and the flag causes no meaningful geometric shift.
+  - Radiometry: S−L HH median is −0.31 dB outside the flag and +0.07 dB inside it. That may be the land-cover mix; check per land-cover class before fusing.
 - **`gcov_to_cog.py` fixes:**
   - Samples with mask 0 or 255 are now dropped before averaging. The old code averaged them in (3.9% of the 20 Jun grid). The 20 m mask follows the same rule as the data.
   - Covariance terms and looks are rounded to 16 mantissa bits, the precision of the L-band product (error ≤ 2⁻¹⁷, about 0.00003 dB). This makes them about 22% smaller. `--keep-bits 23` turns it off.
@@ -81,7 +86,7 @@ Next steps, in order:
    python scripts/bhoonidhi_s_band.py download --convert --delete-raw --ids \
        NISAR_S2_PR_GCOV_025_098_A_014_3700_DHNA_A_20260714T233811_20260714T233848_P00500_M_F_I_001
    ```
-3. Check L–S co-registration on 18 Oct (the same joint pass) by cross-correlating S HHHH against L HHHH. Do it separately inside and outside the S-band sample-shift flag. Repeat for 12 Sep: S-band there is urgent-response only, so check its geolocation before using it.
+3. L–S co-registration is done for 18 Oct (offset 0.00 ± 0.05 px). Repeat it for 12 Sep before using it, since S-band there is urgent-response only. Then check the S−L radiometric offset inside vs. outside the sample-shift flag, per WorldCover class.
 4. Align the supporting layers to the real grid: `python scripts/fetch_ancillary.py --warp-to data/work/L/<granule>_HHHH_20m.tif`.
 5. Then follow the method and schedule below.
 
