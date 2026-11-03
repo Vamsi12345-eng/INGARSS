@@ -12,6 +12,7 @@ scripts/
   fetch_nisar_l.py       download L-band GCOV (needs EARTHDATA_TOKEN), optionally shrink to 20 m
   gcov_to_cog.py         GCOV HDF5 -> 20 m Cloud-Optimized GeoTIFFs (L- or S-band, full frame)
   bhoonidhi_s_band.py    search/download S-band GCOV from ISRO Bhoonidhi (needs BHOONIDHI_USER/PASSWORD)
+  coreg_check.py         sub-pixel L-vs-S co-registration on the shared 20 m grid
 data/inventory/          granule inventories and the preview water ranking (committed)
 data/raw/, data/work/    downloads and intermediate rasters (not committed)
 docs/figures/            figures

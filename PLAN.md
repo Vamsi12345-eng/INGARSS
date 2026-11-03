@@ -15,7 +15,7 @@ Done on 3 Nov:
   - Descending (track 120, frame 76), compact-pol, full frame, PROVISIONAL: 21 Aug; 2, 14, 26 Sep (the quad-pol joint passes).
   - **None for 20 Jun, 2 Jul or 22 Jun**, and none for Nov 2025 – May 2026 (the Jan–Feb search returns "NO RESULTS FOUND"). Scenario B is not possible.
   - Also over the point: descending track 48 (frames 75/76), compact-pol, 28 Aug; 9, 21 Sep; 3 Oct. Our L-band inventory does not cover track 48.
-- **Step-4 checks on real files (L 20 Jun, S 18 Oct)**:
+- **Checks on the real files** (step 4 on L 20 Jun and S 18 Oct; co-registration on all three joint pairs):
   - x/yCoordinates are pixel centres. L-band says so (`pixel_coordinate_convention: center`). S-band (product spec 1.2.1) omits the attribute, but its coordinates sit on the same 5 m offsets, so its 20 m blocks fall exactly on the L-band 20 m lattice (offset 36 × 144 pixels, no resampling needed).
   - L 20 Jun output vs ASF preview: correlation peaks at zero shift (r = 0.53). Valid-swath corners match the file's `boundingPolygon`.
   - EPSG 32645 is read correctly from `projection.epsg_code`.
@@ -28,10 +28,14 @@ Done on 3 Nov:
     - Inside the flag (141 windows): −0.05 px (1 m) in x.
     - So the S-band pixel-centre reading is right, and the flag causes no meaningful geometric shift.
   - Radiometry: S−L HH median is −0.31 dB outside the flag and +0.07 dB inside it. That may be the land-cover mix; check per land-cover class before fusing.
+  - **12 Sep ascending** (L PROVISIONAL vs S urgent-response): 0.00 px in y and −0.05 px (1 m) in x, so the urgent-response S-band geolocation is fine. S−L HH: −0.21 dB outside the flag, +0.19 dB inside (the same 0.4 dB pattern).
+  - **14 Sep descending** (L quad-pol HH vs S compact-pol RH): **S is offset −0.20 px (about 4 m) in y** (IQR −0.25..−0.20 over 327 windows), with 0.00 in x. The offset is in one axis only, so it is not the pixel-centre question. Shift S by +0.2 px in y before polarimetric L+S fusion, or state it.
+  - Quad-pol sanity check on L 14 Sep: HV and VH agree to 0.1 dB (−15.74 vs −15.64 dB), and HH ≈ VV (−7.06 vs −7.18 dB). The mask shows 4 sub-swaths.
 - **`gcov_to_cog.py` fixes:**
   - Samples with mask 0 or 255 are now dropped before averaging. The old code averaged them in (3.9% of the 20 Jun grid). The 20 m mask follows the same rule as the data.
   - Covariance terms and looks are rounded to 16 mantissa bits, the precision of the L-band product (error ≤ 2⁻¹⁷, about 0.00003 dB). This makes them about 22% smaller. `--keep-bits 23` turns it off.
   - The exception mask is exported.
+  - The overviews of uint8 layers (mask and exception mask) now use `mode`. Averaging category codes had produced invalid values in zoomed-out views. The overviews of existing files were rebuilt; full-resolution data was unchanged.
   - Ascending outputs are about 1.5 GB per date.
 - **`bhoonidhi_s_band.py` tested live:**
   - About 1 in 3 TLS handshakes to the API is reset, so every call now retries.
@@ -39,13 +43,24 @@ Done on 3 Nov:
   - Downloads resume (`Accept-Ranges: bytes`), and server filenames are sanitized.
   - New options: `--convert`, `--offdiag`, `--delete-raw`.
   - S-band files are 12.6 GB and arrive at about 9 MB/s (about 25 min each). The web portal `bhoonidhi.nrsc.gov.in` refuses connections from the cloud session, but the API host works.
-- **Downloads, 20 m outputs in `data/work/{L,S}/`** (local to the session, not committed):
-  - L: A 20 Jun, 12 Sep, 18 Oct, and D 14 Sep with `--offdiag`.
-  - S: A 18 Oct, 12 Sep (urgent-response), and D 14 Sep with `--offdiag`.
-  - Some were still running when this was written; check `data/work/`.
+- **All listed files are on the 20 m grid** in `data/work/{L,S}/`. They are local to the session's container, not committed, and the raw `.h5` files are deleted.
+  - Each granule was checked for complete layers, mask agreement of at least 99.93%, and plausible medians. Medians below are of the 80 m overviews.
+
+  | Granule | Layers | Valid | Size | HH (or RH) median |
+  |---|---|---|---|---|
+  | L A 20 Jun | HHHH, HVHV, looks, mask | 51% | 1.5 GB | −9.8 dB |
+  | L A 12 Sep | + exception mask | 51% | 1.5 GB | −7.5 dB |
+  | L A 18 Oct | + exception mask | 50% | 1.5 GB | −6.7 dB |
+  | L D 14 Sep quad-pol | 4 diagonal + 6 off-diagonal (real/imag), looks, masks | 44% | 8.6 GB | −7.1 dB |
+  | S A 12 Sep (urgent-response) | HHHH, HVHV, looks, masks | 55% | 1.1 GB | −7.8 dB |
+  | S A 18 Oct | HHHH, HVHV, looks, masks | 56% | 1.1 GB | −7.0 dB |
+  | S D 14 Sep compact-pol | RHRH, RVRV, RHRV (real/imag), looks, masks | 49% | 2.2 GB | −10.3 dB (RH) |
+
+  - The L 20 Jun file has no exception-mask layer: it was converted before that export existed, and L-band has no exceptions (`hasInputDataException` = 0).
+  - The sample-shift flag covers 36% of the valid swath in both ascending S files and 9% in S D 14 Sep.
 - **Disk.** The session allowance is about 30 GB, so only one large raw file can be processed at a time.
-  - When all the listed files are done, outputs are about 19 GB. D 14 Sep with off-diagonals is about 8 GB of that, because its native spacing is already 20 m.
-  - That leaves about 10 GB for the supporting layers and analysis.
+  - Outputs are now about 17.5 GB, leaving 13 GB free for the supporting layers (about 4 GB) and analysis.
+  - Another S-band raw (12.6 GB) plus its outputs needs about 13.7 GB, so it does not fit without deleting something (next step 2).
 
 Done on 2 Nov:
 - Scene inventory for both frames, built from ASF's public search API (no login): `data/inventory/nisar_L_gcov_inventory.csv`.
@@ -57,9 +72,9 @@ Done on 2 Nov:
 - Scripts in `scripts/`:
   - `nisar_inventory.py`: tested live.
   - `preview_water_proxy.py`: tested live.
-  - `gcov_to_cog.py`: tested on a synthetic file that follows the documented layout only.
-  - `fetch_nisar_l.py`: download untested; needs `EARTHDATA_TOKEN`.
-  - `bhoonidhi_s_band.py`: untested; needs Bhoonidhi credentials.
+  - `gcov_to_cog.py`: tested on a synthetic file that follows the documented layout only (3 Nov: fixed and tested on real L and S files).
+  - `fetch_nisar_l.py`: download untested; needs `EARTHDATA_TOKEN` (3 Nov: works, 26–29 MB/s).
+  - `bhoonidhi_s_band.py`: untested; needs Bhoonidhi credentials (3 Nov: fixed and tested live).
   - `fetch_ancillary.py`: tested. Downloads JRC surface water, ESA WorldCover, GLO-30 HAND and DEM for both frames (about 2.7 GB, 4 minutes, no login) and aligns them to the 20 m grid.
 - Sentinel-2 validation candidates (tile 45RVJ, cloud % for the whole tile):
   - 18 Oct: 12%, same day as the NISAR pass.
@@ -70,7 +85,7 @@ Done on 2 Nov:
 Credentials are expected as environment variables: `EARTHDATA_TOKEN`, `BHOONIDHI_USER`, `BHOONIDHI_PASSWORD`. Bhoonidhi's API needs the user ID and password in the request body, so they can't be network secrets. Never paste them into chat or commit them.
 
 Next steps, in order:
-1. Make sure every listed file is on the 20 m grid. To redo them in a fresh session (L-band about 5 min per file, S-band about 25 min):
+1. Done on 3 Nov in this session. If a fresh session has to redo the 20 m files, run these. L-band takes about 5 min per file, S-band about 25 min. It took about 2 h in all on 3 Nov, running L and S side by side but never two large raw files at once.
    ```bash
    python scripts/fetch_nisar_l.py --direction A --dates 2026-06-20 2026-09-12 2026-10-18 --convert --delete-raw
    python scripts/fetch_nisar_l.py --direction D --dates 2026-09-14 --convert --offdiag --delete-raw
@@ -80,13 +95,18 @@ Next steps, in order:
    python scripts/bhoonidhi_s_band.py download --convert --offdiag --delete-raw --ids \
        NISAR_S2_PR_GCOV_030_120_D_076_2500_CRNA_A_20260914T125059_20260914T125135_P00500_M_F_I_001
    ```
-2. **Decide on 14 Jul (open).** 20 Jun has no S-band, so the only three-way L/S/L+S *gain* pair is 14 Jul → 12 Sep. 14 Jul is the earliest joint date, and the previews show water still low then. It needs L 14 Jul (7 GB raw) plus S 14 Jul (12.6 GB raw): about 3 GB of outputs, but a 12.6 GB raw doesn't fit next to all the other outputs. So either get it before the quad-pol file, or drop the D off-diagonals, or accept that the three-way change test uses only the 12 Sep → 18 Oct loss pair.
+2. **Decide on 14 Jul (open).** 20 Jun has no S-band, so the only three-way L/S/L+S *gain* pair is 14 Jul → 12 Sep. 14 Jul is the earliest joint date, and the previews show water still low then.
+   - It needs L 14 Jul (7 GB raw) plus S 14 Jul (12.6 GB raw), for about 3 GB of outputs.
+   - **It does not fit in this session as things stand.** 12.8 GB is free (caches hold only 0.36 GB), but the S raw plus its outputs needs about 13.7 GB.
+   - Options: temporarily drop something large, such as the L D 14 Sep off-diagonals (6.4 GB, re-downloadable in about 30 min). Or accept that the three-way change test uses only the 12 Sep → 18 Oct loss pair.
    ```bash
    python scripts/fetch_nisar_l.py --direction A --dates 2026-07-14 --convert --delete-raw
    python scripts/bhoonidhi_s_band.py download --convert --delete-raw --ids \
        NISAR_S2_PR_GCOV_025_098_A_014_3700_DHNA_A_20260714T233811_20260714T233848_P00500_M_F_I_001
    ```
-3. L–S co-registration is done for 18 Oct (offset 0.00 ± 0.05 px). Repeat it for 12 Sep before using it, since S-band there is urgent-response only. Then check the S−L radiometric offset inside vs. outside the sample-shift flag, per WorldCover class.
+3. L–S co-registration is done for all three joint pairs (`scripts/coreg_check.py`; results above). Still to do:
+   - Correct the −0.20 px y offset of S D 14 Sep, or state it.
+   - Check the S−L radiometric offset inside vs. outside the sample-shift flag, per WorldCover class. The 0.4 dB gap repeats on 12 Sep and 18 Oct.
 4. Align the supporting layers to the real grid: `python scripts/fetch_ancillary.py --warp-to data/work/L/<granule>_HHHH_20m.tif`.
 5. Then follow the method and schedule below.
 

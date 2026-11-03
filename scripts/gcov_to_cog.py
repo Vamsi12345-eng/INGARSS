@@ -112,8 +112,9 @@ def write_cog(path, arrays_fn, out_h, out_w, count, dtype, transform, crs, tags,
             block = arrays_fn(r0, r1)
             for b in range(count):
                 dst.write(block[b], b + 1, window=((r0, r1), (0, out_w)))
+    # uint8 layers are categorical (mask codes, exception bit flags): averaging codes in overviews is meaningless
     rio_copy(tmp, path, driver="COG", compress="DEFLATE", predictor=3 if dtype == "float32" else 2,
-             BIGTIFF="IF_SAFER", overview_resampling="average")
+             BIGTIFF="IF_SAFER", overview_resampling="mode" if dtype == "uint8" else "average")
     os.remove(tmp)
     print(f"  wrote {path}")
 
