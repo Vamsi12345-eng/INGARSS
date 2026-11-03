@@ -1,0 +1,367 @@
+{
+ "date": "2026-09-12",
+ "reference": "s2_water_20260913_20m.tif",
+ "reference_tiles": "S2B_45RUH_20260913_0_L2A@2026-09-13T05:01:49Z(cloud 24%);S2B_45RTH_20260913_0_L2A@2026-09-13T05:01:52Z(cloud 25%);S2B_44RRN_20260913_0_L2A@2026-09-13T05:01:52Z(cloud 27%);S2B_45RTJ_20260913_0_L2A@2026-09-13T05:01:37Z(cloud 27%);S2B_44RRP_20260913_0_L2A@2026-09-13T05:01:38Z(cloud 28%);S2A_45RTJ_20260913_1_L2A@2026-09-13T05:11:49Z(cloud 31%);S2A_44RRP_20260913_1_L2A@2026-09-13T05:11:50Z(cloud 32%);S2A_45RTH_20260913_1_L2A@2026-09-13T05:12:04Z(cloud 32%);S2A_45RUH_20260913_1_L2A@2026-09-13T05:11:55Z(cloud 32%);S2A_44RRN_20260913_1_L2A@2026-09-13T05:12:04Z(cloud 33%);S2A_45RUJ_20260913_1_L2A@2026-09-13T05:11:45Z(cloud 37%);S2B_45RUJ_20260913_0_L2A@2026-09-13T05:01:34Z(cloud 38%);S2B_45RVH_20260913_0_L2A@2026-09-13T05:01:45Z(cloud 42%);S2B_45RTK_20260913_0_L2A@2026-09-13T05:01:25Z(cloud 43%);S2A_45RTK_20260913_1_L2A@2026-09-13T05:11:35Z(cloud 44%);S2A_45RUK_20260913_1_L2A@2026-09-13T05:11:31Z(cloud 46%);S2B_45QUG_20260913_0_L2A@2026-09-13T05:02:03Z(cloud 47%);S2B_45QTG_20260913_0_L2A@2026-09-13T05:02:06Z(cloud 54%);S2B_45RUK_20260913_0_L2A@2026-09-13T05:01:20Z(cloud 57%);S2B_45RWH_20260913_0_L2A@2026-09-13T05:01:42Z(cloud 57%);S2B_44QRM_20260913_0_L2A@2026-09-13T05:02:07Z(cloud 58%);S2B_45RVJ_20260913_0_L2A@2026-09-13T05:01:31Z(cloud 59%);S2B_45QVF_20260913_0_L2A@2026-09-13T05:02:14Z(cloud 61%);S2A_45QTG_20260913_1_L2A@2026-09-13T05:12:18Z(cloud 65%);S2B_45QUF_20260913_0_L2A@2026-09-13T05:02:18Z(cloud 66%);S2A_44QRM_20260913_1_L2A@2026-09-13T05:12:19Z(cloud 67%);S2B_45QWF_20260913_0_L2A@2026-09-13T05:02:07Z(cloud 70%);S2B_45RVK_20260913_0_L2A@2026-09-13T05:01:16Z(cloud 73%);S2B_45QVG_20260913_0_L2A@2026-09-13T05:01:59Z(cloud 79%)",
+ "domain_km2": 59347.9,
+ "validated_km2": 21941.3,
+ "reference_water_share": 0.1,
+ "blocks": 2001,
+ "sets": {
+  "L": {
+   "OA": 0.9467,
+   "precision": 0.7027,
+   "recall": 0.8095,
+   "F1": 0.7523,
+   "IoU": 0.603,
+   "F1_CI95": [
+    0.7263,
+    0.7746
+   ],
+   "TP_FP_FN_TN": [
+    4438649,
+    1878296,
+    1044382,
+    47491843
+   ],
+   "mapped_water_km2": 6772.6,
+   "adjusted_water_km2": 5890.1,
+   "adjusted_water_km2_CI95": [
+    5564.8,
+    6206.5
+   ]
+  },
+  "S": {
+   "OA": 0.9595,
+   "precision": 0.872,
+   "recall": 0.6967,
+   "F1": 0.7745,
+   "IoU": 0.632,
+   "F1_CI95": [
+    0.751,
+    0.7949
+   ],
+   "TP_FP_FN_TN": [
+    3819791,
+    560710,
+    1663240,
+    48809429
+   ],
+   "mapped_water_km2": 4964.3,
+   "adjusted_water_km2": 6121.0,
+   "adjusted_water_km2_CI95": [
+    5868.4,
+    6370.4
+   ]
+  },
+  "LS": {
+   "OA": 0.961,
+   "precision": 0.8255,
+   "recall": 0.7734,
+   "F1": 0.7986,
+   "IoU": 0.6647,
+   "F1_CI95": [
+    0.7767,
+    0.8171
+   ],
+   "TP_FP_FN_TN": [
+    4240803,
+    896744,
+    1242228,
+    48473395
+   ],
+   "mapped_water_km2": 5630.2,
+   "adjusted_water_km2": 5989.7,
+   "adjusted_water_km2_CI95": [
+    5747.1,
+    6228.7
+   ]
+  },
+  "L4x": {
+   "OA": 0.9413,
+   "precision": 0.6749,
+   "recall": 0.797,
+   "F1": 0.7309,
+   "IoU": 0.5759,
+   "F1_CI95": [
+    0.7029,
+    0.7552
+   ],
+   "TP_FP_FN_TN": [
+    4369717,
+    2104893,
+    1113314,
+    47265246
+   ],
+   "mapped_water_km2": 6859.9,
+   "adjusted_water_km2": 5837.6,
+   "adjusted_water_km2_CI95": [
+    5503.4,
+    6174.4
+   ]
+  },
+  "AND": {
+   "OA": 0.9608,
+   "precision": 0.9084,
+   "recall": 0.676,
+   "F1": 0.7752,
+   "IoU": 0.6329,
+   "F1_CI95": [
+    0.7526,
+    0.795
+   ],
+   "TP_FP_FN_TN": [
+    3706636,
+    373934,
+    1776395,
+    48996205
+   ],
+   "mapped_water_km2": 4516.8,
+   "adjusted_water_km2": 6021.3,
+   "adjusted_water_km2_CI95": [
+    5783.7,
+    6261.0
+   ]
+  },
+  "OR": {
+   "OA": 0.9454,
+   "precision": 0.6879,
+   "recall": 0.8302,
+   "F1": 0.7524,
+   "IoU": 0.603,
+   "F1_CI95": [
+    0.7258,
+    0.7749
+   ],
+   "TP_FP_FN_TN": [
+    4551804,
+    2065072,
+    931227,
+    47305067
+   ],
+   "mapped_water_km2": 7220.1,
+   "adjusted_water_km2": 5973.1,
+   "adjusted_water_km2_CI95": [
+    5639.6,
+    6294.4
+   ]
+  }
+ },
+ "differences": {
+  "LS-L": {
+   "dF1": 0.0463,
+   "CI95": [
+    0.0413,
+    0.0517
+   ],
+   "share_of_resamples_above_0": 1.0
+  },
+  "LS-S": {
+   "dF1": 0.0241,
+   "CI95": [
+    0.0182,
+    0.0304
+   ],
+   "share_of_resamples_above_0": 1.0
+  },
+  "LS-L4x": {
+   "dF1": 0.0677,
+   "CI95": [
+    0.0607,
+    0.0748
+   ],
+   "share_of_resamples_above_0": 1.0
+  },
+  "S-L": {
+   "dF1": 0.0222,
+   "CI95": [
+    0.0139,
+    0.031
+   ],
+   "share_of_resamples_above_0": 1.0
+  },
+  "LS-OR": {
+   "dF1": 0.0462,
+   "CI95": [
+    0.0401,
+    0.0528
+   ],
+   "share_of_resamples_above_0": 1.0
+  },
+  "LS-AND": {
+   "dF1": 0.0234,
+   "CI95": [
+    0.0169,
+    0.0303
+   ],
+   "share_of_resamples_above_0": 1.0
+  }
+ },
+ "mcnemar": {
+  "LS-L": {
+   "only_first_correct": 1743,
+   "only_second_correct": 516,
+   "chi2": 665.37,
+   "p": 1.01e-146,
+   "n": 87749
+  },
+  "LS-S": {
+   "only_first_correct": 1007,
+   "only_second_correct": 858,
+   "chi2": 11.74,
+   "p": 0.00061,
+   "n": 87749
+  },
+  "LS-L4x": {
+   "only_first_correct": 2610,
+   "only_second_correct": 894,
+   "chi2": 839.39,
+   "p": 1.47e-184,
+   "n": 87749
+  },
+  "S-L": {
+   "only_first_correct": 2539,
+   "only_second_correct": 1461,
+   "chi2": 289.98,
+   "p": 5.02e-65,
+   "n": 87749
+  },
+  "LS-OR": {
+   "only_first_correct": 1899,
+   "only_second_correct": 534,
+   "chi2": 764.69,
+   "p": 2.56e-168,
+   "n": 87749
+  },
+  "LS-AND": {
+   "only_first_correct": 851,
+   "only_second_correct": 840,
+   "chi2": 0.06,
+   "p": 0.808,
+   "n": 87749
+  }
+ },
+ "by_worldcover": {
+  "tree": {
+   "validated_km2": 4453.9,
+   "reference_water_share": 0.0078,
+   "L": 0.2989,
+   "S": 0.2676,
+   "LS": 0.2918,
+   "L4x": 0.2371,
+   "AND": 0.2247,
+   "OR": 0.3354
+  },
+  "shrub": {
+   "validated_km2": 173.1,
+   "reference_water_share": 0.0006,
+   "L": 0.1723,
+   "S": 0.1835,
+   "LS": 0.1896,
+   "L4x": 0.1648,
+   "AND": 0.1859,
+   "OR": 0.1705
+  },
+  "grass": {
+   "validated_km2": 2734.3,
+   "reference_water_share": 0.0405,
+   "L": 0.3521,
+   "S": 0.4429,
+   "LS": 0.4139,
+   "L4x": 0.3327,
+   "AND": 0.49,
+   "OR": 0.3351
+  },
+  "cropland": {
+   "validated_km2": 13168.8,
+   "reference_water_share": 0.1202,
+   "L": 0.7634,
+   "S": 0.7846,
+   "LS": 0.8139,
+   "L4x": 0.7373,
+   "AND": 0.7786,
+   "OR": 0.7686
+  },
+  "built-up": {
+   "validated_km2": 835.6,
+   "reference_water_share": 0.0047,
+   "L": 0.0394,
+   "S": 0.0485,
+   "LS": 0.0405,
+   "L4x": 0.027,
+   "AND": 0.0265,
+   "OR": 0.0586
+  },
+  "bare/sparse": {
+   "validated_km2": 128.9,
+   "reference_water_share": 0.4689,
+   "L": 0.8234,
+   "S": 0.7549,
+   "LS": 0.8194,
+   "L4x": 0.7958,
+   "AND": 0.7584,
+   "OR": 0.8175
+  },
+  "permanent water": {
+   "validated_km2": 437.9,
+   "reference_water_share": 0.905,
+   "L": 0.9552,
+   "S": 0.9089,
+   "LS": 0.9541,
+   "L4x": 0.9536,
+   "AND": 0.9008,
+   "OR": 0.9622
+  },
+  "herbaceous wetland": {
+   "validated_km2": 8.6,
+   "reference_water_share": 0.409,
+   "L": 0.8455,
+   "S": 0.8145,
+   "LS": 0.8451,
+   "L4x": 0.8337,
+   "AND": 0.7994,
+   "OR": 0.8578
+  }
+ },
+ "by_hand": {
+  "0-1 m": {
+   "validated_km2": 9792.3,
+   "reference_water_share": 0.1836,
+   "L": 0.8181,
+   "S": 0.8138,
+   "LS": 0.8513,
+   "L4x": 0.7978,
+   "AND": 0.8068,
+   "OR": 0.8239
+  },
+  "1-3 m": {
+   "validated_km2": 3910.0,
+   "reference_water_share": 0.0677,
+   "L": 0.6816,
+   "S": 0.7279,
+   "LS": 0.7443,
+   "L4x": 0.6514,
+   "AND": 0.7304,
+   "OR": 0.6814
+  },
+  "3-10 m": {
+   "validated_km2": 5456.0,
+   "reference_water_share": 0.023,
+   "L": 0.3745,
+   "S": 0.4941,
+   "LS": 0.4524,
+   "L4x": 0.3575,
+   "AND": 0.5326,
+   "OR": 0.3622
+  },
+  "10-inf m": {
+   "validated_km2": 2783.0,
+   "reference_water_share": 0.0019,
+   "L": 0.0123,
+   "S": 0.0185,
+   "LS": 0.014,
+   "L4x": 0.0102,
+   "AND": 0.0188,
+   "OR": 0.0129
+  }
+ }
+}

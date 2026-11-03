@@ -10,3 +10,4 @@ scikit-image>=0.22
 statsmodels>=0.14
 matplotlib>=3.8
 geopandas>=0.14
+pyproj>=3.6

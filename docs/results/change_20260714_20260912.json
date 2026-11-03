@@ -1,0 +1,108 @@
+{
+ "dates": [
+  "2026-07-14",
+  "2026-09-12"
+ ],
+ "sets": {
+  "L": {
+   "stable_land_km2": 49346.0,
+   "stable_water_km2": 2178.9,
+   "new_water_km2": 4501.3,
+   "water_loss_km2": 1457.6,
+   "compared_km2": 57483.9,
+   "confident_new_water_km2": 5020.8,
+   "new_water_outside_persistent_km2": 4481.8,
+   "new_water_by_worldcover_km2": {
+    "tree": 20.3,
+    "shrub": 0.1,
+    "grass": 345.7,
+    "cropland": 3697.1,
+    "built-up": 0.8,
+    "bare/sparse": 82.8,
+    "permanent water": 348.3,
+    "herbaceous wetland": 6.3
+   },
+   "new_water_by_hand_km2": {
+    "0-1 m": 3516.3,
+    "1-3 m": 556.4,
+    "3-10 m": 392.3,
+    "10-1000 m": 36.4
+   }
+  },
+  "S": {
+   "stable_land_km2": 51872.7,
+   "stable_water_km2": 1272.6,
+   "new_water_km2": 3616.4,
+   "water_loss_km2": 722.1,
+   "compared_km2": 57483.9,
+   "confident_new_water_km2": 4453.1,
+   "new_water_outside_persistent_km2": 3581.7,
+   "new_water_by_worldcover_km2": {
+    "tree": 24.1,
+    "shrub": 0.1,
+    "grass": 374.4,
+    "cropland": 2746.3,
+    "built-up": 1.5,
+    "bare/sparse": 84.2,
+    "permanent water": 379.7,
+    "herbaceous wetland": 6.0
+   },
+   "new_water_by_hand_km2": {
+    "0-1 m": 2765.4,
+    "1-3 m": 447.5,
+    "3-10 m": 359.0,
+    "10-1000 m": 44.6
+   }
+  },
+  "LS": {
+   "stable_land_km2": 50858.0,
+   "stable_water_km2": 1775.0,
+   "new_water_km2": 3773.7,
+   "water_loss_km2": 1077.2,
+   "compared_km2": 57483.9,
+   "confident_new_water_km2": 4236.7,
+   "new_water_outside_persistent_km2": 3757.7,
+   "new_water_by_worldcover_km2": {
+    "tree": 19.3,
+    "shrub": 0.0,
+    "grass": 298.6,
+    "cropland": 3037.6,
+    "built-up": 0.8,
+    "bare/sparse": 79.9,
+    "permanent water": 331.6,
+    "herbaceous wetland": 5.8
+   },
+   "new_water_by_hand_km2": {
+    "0-1 m": 2997.2,
+    "1-3 m": 449.9,
+    "3-10 m": 298.6,
+    "10-1000 m": 28.1
+   }
+  },
+  "L4x": {
+   "stable_land_km2": 49007.3,
+   "stable_water_km2": 2451.4,
+   "new_water_km2": 4317.3,
+   "water_loss_km2": 1707.9,
+   "compared_km2": 57483.9,
+   "confident_new_water_km2": 4352.9,
+   "new_water_outside_persistent_km2": 4303.1,
+   "new_water_by_worldcover_km2": {
+    "tree": 15.6,
+    "shrub": 0.0,
+    "grass": 290.2,
+    "cropland": 3610.2,
+    "built-up": 0.5,
+    "bare/sparse": 73.2,
+    "permanent water": 321.4,
+    "herbaceous wetland": 6.1
+   },
+   "new_water_by_hand_km2": {
+    "0-1 m": 3386.7,
+    "1-3 m": 543.6,
+    "3-10 m": 359.0,
+    "10-1000 m": 27.9
+   }
+  }
+ }
+}

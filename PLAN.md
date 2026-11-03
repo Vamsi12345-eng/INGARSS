@@ -7,7 +7,32 @@
 Using only NISAR L2 GCOV data, map surface water and its change between dates (stable water, new water, water loss) over the full NISAR scene around Bihar's Ganga floodplain (centre 25.5°N, 86.5°E), three ways: L-band only, S-band only, and L+S combined.
 The core question is whether combining L and S (plus the polarimetric channels, where available) measurably beats either band alone. The answer must be backed by validation metrics, honest uncertainty and reproducible code.
 
-## Status and handoff (3 Nov 2026)
+## Status and handoff (3–4 Nov 2026)
+
+**Result: L+S beats either band alone, on both validated dates.**
+
+| Validated against Sentinel-2 | L only | S only | L+S | L+S − L (95% CI) | L+S − S (95% CI) |
+|---|---|---|---|---|---|
+| F1, 18 Oct | 0.671 | 0.672 | **0.698** | +0.027 [+0.022, +0.033] | +0.026 [+0.020, +0.034] |
+| F1, 12 Sep (S2 13 Sep) | 0.752 | 0.774 | **0.799** | +0.046 [+0.041, +0.052] | +0.024 [+0.018, +0.030] |
+
+- **Control:** L with about 4× the looks is worse (0.639 and 0.731), so the gain comes from the second frequency, not from more data.
+- **Change (L+S):** 14 Jul → 12 Sep gained 3,774 km² of new water (80% cropland, 79% at HAND < 1 m); 12 Sep → 18 Oct lost 3,273 km².
+- **Deliverables:**
+  - `docs/technical_note.md` and `.pdf` (4 pages)
+  - figures in `docs/figures/`, numbers in `docs/results/`
+  - slides: https://claude.ai/artifact/P58jpdfijX2SJMPHTCKic1. They are private until shared from the deck's Share menu, and download as .pptx or PDF.
+
+Analysis done on the night of 3 Nov:
+- **Plan A:** L and S ascending 14 Jul downloaded and converted. That is the joint low-water date for the three-way *gain* pair 14 Jul → 12 Sep. To make room, five of the six L D 14 Sep off-diagonals were deleted; HHVV was kept, for Pauli and the HH−VV phase.
+- **Pipeline:** `scripts/run_analysis.sh` runs `water_maps.py` (one algorithm for L, S, L+S, an L4x equal-information control, AND, OR), `change_maps.py`, `validate.py` and `make_figures.py`. Polarimetry: `polarimetry_quicklook.py`.
+- **Reference:** `fetch_s2_reference.py` builds the Sentinel-2 L2A MNDWI water reference: 18 Oct (24 tiles, 55% of the grid clear) and 13 Sep (29 tiles, 31% clear).
+  - Earth Search already removes the BOA offset (`earthsearch:boa_offset_applied`) but still lists −0.1 in `raster:bands`. Applying it twice made vegetation look like water; this is fixed.
+- **Threshold rule:** the median of the per-tile KI thresholds. A KI split of the pooled histogram was captured by a very bright mode on 20 Jun (−2.9 dB).
+- **20 Jun fails** with the same method: 46% of the frame classed as water. Dry, smooth pre-monsoon fields are as dark as water at L-band, and there is no S-band that day. It is reported as a limitation and left out of the change maps and charts; 14 Jul is the baseline.
+- **59° phase sign:** for the GCOV **HHVV** term the correction is **e^(+j59°)**, not e^(−j59°) as issue 4 below states.
+  - With +59°, open water sits at −20° and bright double-bounce targets at +167°. With −59° they would sit at −138° and +49°.
+  - Check the other terms the same way before any decomposition (`docs/results/polarimetry_20260914.json`).
 
 Done on 3 Nov:
 - **S-band checked: Scenario A.** Bhoonidhi has 21 S-band GCOV items over the reference point for Jun–Nov 2026, all `Online=Y` (downloadable): `data/inventory/nisar_S_gcov_inventory.csv` (+ raw STAC JSON).
@@ -85,30 +110,28 @@ Done on 2 Nov:
 Credentials are expected as environment variables: `EARTHDATA_TOKEN`, `BHOONIDHI_USER`, `BHOONIDHI_PASSWORD`. Bhoonidhi's API needs the user ID and password in the request body, so they can't be network secrets. Never paste them into chat or commit them.
 
 Next steps, in order:
-1. Done on 3 Nov in this session. If a fresh session has to redo the 20 m files, run these. L-band takes about 5 min per file, S-band about 25 min. It took about 2 h in all on 3 Nov, running L and S side by side but never two large raw files at once.
+1. **Before submitting (by 10 Nov, about 6 PM IST):**
+   - Replace `[team name]` in `docs/technical_note.md` and on the cover slide.
+   - Share the deck from its Share menu if teammates need it; download it as .pptx or PDF for the submission.
+   - Read the note and slides against the rubric and the checklist below.
+2. **To redo the 20 m files in a fresh session** (the session container is not permanent): about 2 h. Then run `./scripts/run_analysis.sh` (about 45 min) and `python scripts/fetch_ancillary.py --warp-to <grid>` before it.
    ```bash
-   python scripts/fetch_nisar_l.py --direction A --dates 2026-06-20 2026-09-12 2026-10-18 --convert --delete-raw
+   python scripts/fetch_nisar_l.py --direction A --dates 2026-07-14 2026-09-12 2026-10-18 --convert --delete-raw
    python scripts/fetch_nisar_l.py --direction D --dates 2026-09-14 --convert --offdiag --delete-raw
    python scripts/bhoonidhi_s_band.py download --convert --delete-raw --ids \
-       NISAR_S2_PR_GCOV_033_098_A_014_3700_DHNA_A_20261018T233810_20261018T233847_P00500_M_F_I_001 \
-       NISAR_S2_UR_GCOV_030_098_A_014_3700_DHNA_A_20260912T233809_20260912T233846_P00500_N_F_I_001
+       NISAR_S2_PR_GCOV_025_098_A_014_3700_DHNA_A_20260714T233811_20260714T233848_P00500_M_F_I_001 \
+       NISAR_S2_UR_GCOV_030_098_A_014_3700_DHNA_A_20260912T233809_20260912T233846_P00500_N_F_I_001 \
+       NISAR_S2_PR_GCOV_033_098_A_014_3700_DHNA_A_20261018T233810_20261018T233847_P00500_M_F_I_001
    python scripts/bhoonidhi_s_band.py download --convert --offdiag --delete-raw --ids \
        NISAR_S2_PR_GCOV_030_120_D_076_2500_CRNA_A_20260914T125059_20260914T125135_P00500_M_F_I_001
    ```
-2. **Decide on 14 Jul (open).** 20 Jun has no S-band, so the only three-way L/S/L+S *gain* pair is 14 Jul → 12 Sep. 14 Jul is the earliest joint date, and the previews show water still low then.
-   - It needs L 14 Jul (7 GB raw) plus S 14 Jul (12.6 GB raw), for about 3 GB of outputs.
-   - **It does not fit in this session as things stand.** 12.8 GB is free (caches hold only 0.36 GB), but the S raw plus its outputs needs about 13.7 GB.
-   - Options: temporarily drop something large, such as the L D 14 Sep off-diagonals (6.4 GB, re-downloadable in about 30 min). Or accept that the three-way change test uses only the 12 Sep → 18 Oct loss pair.
-   ```bash
-   python scripts/fetch_nisar_l.py --direction A --dates 2026-07-14 --convert --delete-raw
-   python scripts/bhoonidhi_s_band.py download --convert --delete-raw --ids \
-       NISAR_S2_PR_GCOV_025_098_A_014_3700_DHNA_A_20260714T233811_20260714T233848_P00500_M_F_I_001
-   ```
-3. L–S co-registration is done for all three joint pairs (`scripts/coreg_check.py`; results above). Still to do:
-   - Correct the −0.20 px y offset of S D 14 Sep, or state it.
-   - Check the S−L radiometric offset inside vs. outside the sample-shift flag, per WorldCover class. The 0.4 dB gap repeats on 12 Sep and 18 Oct.
-4. Align the supporting layers to the real grid: `python scripts/fetch_ancillary.py --warp-to data/work/L/<granule>_HHHH_20m.tif`.
-5. Then follow the method and schedule below.
+3. **Improvements if time allows** (each one is a limitation in the note today):
+   - Explain the 0.4 dB S−L offset inside vs. outside the sample-shift flag, per WorldCover class.
+   - Incidence-angle banding correction.
+   - Add 31 Aug and 6 Oct to the area time series (L PROVISIONAL; S urgent-response and PROVISIONAL).
+   - Labelled sample points (Stehman 2014) for the cloudy peak date and flooded vegetation.
+   - Polarimetric features in the classifier.
+   - Correct the −0.20 px y offset of S D 14 Sep.
 
 ## Data facts (checked 2 Nov 2026)
 

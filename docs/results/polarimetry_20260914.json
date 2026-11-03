@@ -1,0 +1,25 @@
+{
+ "HHVV_phase_check": {
+  "open_water_HH_below_-18dB": {
+   "uncorrected_deg": -79.2,
+   "with_plus_59_deg": -20.2,
+   "with_minus_59_deg": -138.2
+  },
+  "bright_HH_above_-3dB": {
+   "uncorrected_deg": 107.6,
+   "with_plus_59_deg": 166.6,
+   "with_minus_59_deg": 48.6
+  }
+ },
+ "L_quadpol": {
+  "pixels": 4885839,
+  "double_bounce_share": 0.0613,
+  "median_HHVV_coherence": 0.268,
+  "phase_correction_deg": 59
+ },
+ "S_compactpol": {
+  "pixels": 5087560,
+  "median_m": 0.279,
+  "s3_sign_flipped_to_make_water_odd_bounce": false
+ }
+}
