@@ -22,8 +22,14 @@ Done:
   - `gcov_to_cog.py`: tested on a synthetic file that follows the documented layout only.
   - `fetch_nisar_l.py`: download untested; needs `EARTHDATA_TOKEN`.
   - `bhoonidhi_s_band.py`: untested; needs Bhoonidhi credentials.
+  - `fetch_ancillary.py`: tested. Downloads JRC surface water, ESA WorldCover, GLO-30 HAND and DEM for both frames (about 2.7 GB, 4 minutes, no login) and aligns them to the 20 m grid.
+- Sentinel-2 validation candidates (tile 45RVJ, cloud % for the whole tile):
+  - 18 Oct: 12%, same day as the NISAR pass.
+  - 13 Sep: 59%, about 5 hours after the peak pass.
+  - 16 Jan: 0%. 6 Jan: 4%. 2 Nov: 8%. 20 Jun: 70%.
+- Around the reference box: 74% cropland, and the height above the nearest river has a median of 0.4 m. JRC persistent water (occurrence ≥ 75%) covers only 0.5% of the area, against 8.8% water in WorldCover, because the rivers move. So use NISAR dry-season persistence as the main persistent-water layer, with JRC as a cross-check.
 
-Credentials expected as environment variables (or network secrets): `EARTHDATA_TOKEN`, `BHOONIDHI_USER`, `BHOONIDHI_PASSWORD`. Never paste them into chat or commit them.
+Credentials are expected as environment variables: `EARTHDATA_TOKEN`, `BHOONIDHI_USER`, `BHOONIDHI_PASSWORD`. Bhoonidhi's API needs the user ID and password in the request body, so they can't be network secrets. Never paste them into chat or commit them.
 
 Next steps, in order:
 1. Check S-band availability. This decides Scenario A or B (below).
@@ -36,13 +42,14 @@ Next steps, in order:
    python scripts/fetch_nisar_l.py --direction A --dates 2026-06-20 2026-09-12 2026-10-18 --convert --delete-raw
    python scripts/fetch_nisar_l.py --direction D --dates 2026-09-14 --convert --offdiag --delete-raw
    ```
-3. On the first real file, check these (keep the raw `.h5` until checked):
+3. Align the supporting layers to the real grid: `python scripts/fetch_ancillary.py --warp-to data/work/L/<granule>_HHHH_20m.tif`.
+4. On the first real file, check these. Run its download without `--delete-raw`, so the `.h5` stays until checked:
    - The georeferencing assumption: x/yCoordinates are pixel centres. Compare the output against the frame footprint and the preview.
    - That the EPSG code is read correctly.
    - The `mask` value codes.
    - Which covariance terms are present.
-4. Download the S-band GCOV for the matching joint dates. `gcov_to_cog.py` also handles `/science/SSAR`.
-5. Then follow the method and schedule below.
+5. Download the S-band GCOV for the matching joint dates. `gcov_to_cog.py` also handles `/science/SSAR`.
+6. Then follow the method and schedule below.
 
 ## Data facts (checked 2 Nov 2026)
 
