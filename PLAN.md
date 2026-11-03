@@ -7,9 +7,42 @@
 Using only NISAR L2 GCOV data, map surface water and its change between dates (stable water, new water, water loss) over the full NISAR scene around Bihar's Ganga floodplain (centre 25.5°N, 86.5°E), three ways: L-band only, S-band only, and L+S combined.
 The core question is whether combining L and S (plus the polarimetric channels, where available) measurably beats either band alone. The answer must be backed by validation metrics, honest uncertainty and reproducible code.
 
-## Status and handoff (2 Nov 2026)
+## Status and handoff (3 Nov 2026)
 
-Done:
+Done on 3 Nov:
+- **S-band checked: Scenario A.** Bhoonidhi has 21 S-band GCOV items over the reference point for Jun–Nov 2026, all `Online=Y` (downloadable): `data/inventory/nisar_S_gcov_inventory.csv` (+ raw STAC JSON).
+  - Ascending (track 98, frame 14), dual-pol HH/HV, full frame: PROVISIONAL on 14, 26 Jul; 19 Aug; 6, 18 Oct. Urgent-response only on 31 Aug, **12 Sep (the peak)**, 24 Sep, 30 Oct.
+  - Descending (track 120, frame 76), compact-pol, full frame, PROVISIONAL: 21 Aug; 2, 14, 26 Sep (the quad-pol joint passes).
+  - **None for 20 Jun, 2 Jul or 22 Jun**, and none for Nov 2025 – May 2026 (the Jan–Feb search returns "NO RESULTS FOUND"). Scenario B is not possible.
+  - Also over the point: descending track 48 (frames 75/76), compact-pol, 28 Aug; 9, 21 Sep; 3 Oct. Our L-band inventory does not cover track 48.
+- **Step-4 checks on real files (L 20 Jun, S 18 Oct)**:
+  - x/yCoordinates are pixel centres. L-band says so (`pixel_coordinate_convention: center`). S-band (product spec 1.2.1) omits the attribute, but its coordinates sit on the same 5 m offsets, so its 20 m blocks fall exactly on the L-band 20 m lattice (offset 36 × 144 pixels, no resampling needed).
+  - L 20 Jun output vs ASF preview: correlation peaks at zero shift (r = 0.53). Valid-swath corners match the file's `boundingPolygon`.
+  - EPSG 32645 is read correctly from `projection.epsg_code`.
+  - Mask codes: 0 = invalid (partially focused), 1..N = valid (sub-swath number), 255 = outside. L 20 Jun: 3.9% of the grid is 0. S 18 Oct: no 0s.
+  - Terms: L dual-pol = HHHH, HVHV only. **S-band dual-pol also has complex HHHV.**
+  - Precision: L-band covariance terms are stored with 16 mantissa bits. S-band terms use all 23.
+  - **S-band "sample shift" flag.** `inputDataExceptionMask` = 64 ("NISAR SSAR sample shift") on 36% of the 18 Oct valid swath. Check co-registration and radiometry inside vs. outside it (next step 3).
+- **`gcov_to_cog.py` fixes:**
+  - Samples with mask 0 or 255 are now dropped before averaging. The old code averaged them in (3.9% of the 20 Jun grid). The 20 m mask follows the same rule as the data.
+  - Covariance terms and looks are rounded to 16 mantissa bits, the precision of the L-band product (error ≤ 2⁻¹⁷, about 0.00003 dB). This makes them about 22% smaller. `--keep-bits 23` turns it off.
+  - The exception mask is exported.
+  - Ascending outputs are about 1.5 GB per date.
+- **`bhoonidhi_s_band.py` tested live:**
+  - About 1 in 3 TLS handshakes to the API is reset, so every call now retries.
+  - An empty search returns HTTP 404 "NO RESULTS FOUND".
+  - Downloads resume (`Accept-Ranges: bytes`), and server filenames are sanitized.
+  - New options: `--convert`, `--offdiag`, `--delete-raw`.
+  - S-band files are 12.6 GB and arrive at about 9 MB/s (about 25 min each). The web portal `bhoonidhi.nrsc.gov.in` refuses connections from the cloud session, but the API host works.
+- **Downloads, 20 m outputs in `data/work/{L,S}/`** (local to the session, not committed):
+  - L: A 20 Jun, 12 Sep, 18 Oct, and D 14 Sep with `--offdiag`.
+  - S: A 18 Oct, 12 Sep (urgent-response), and D 14 Sep with `--offdiag`.
+  - Some were still running when this was written; check `data/work/`.
+- **Disk.** The session allowance is about 30 GB, so only one large raw file can be processed at a time.
+  - When all the listed files are done, outputs are about 19 GB. D 14 Sep with off-diagonals is about 8 GB of that, because its native spacing is already 20 m.
+  - That leaves about 10 GB for the supporting layers and analysis.
+
+Done on 2 Nov:
 - Scene inventory for both frames, built from ASF's public search API (no login): `data/inventory/nisar_L_gcov_inventory.csv`.
 - Preview-based water ranking, also no login: `data/inventory/preview_water_proxy_ascending.csv` and `docs/figures/ascending_previews_floodplain.jpg`.
   - The floodplain was wettest on **12 Sep 2026**.
@@ -32,24 +65,25 @@ Done:
 Credentials are expected as environment variables: `EARTHDATA_TOKEN`, `BHOONIDHI_USER`, `BHOONIDHI_PASSWORD`. Bhoonidhi's API needs the user ID and password in the request body, so they can't be network secrets. Never paste them into chat or commit them.
 
 Next steps, in order:
-1. Check S-band availability. This decides Scenario A or B (below).
-   ```bash
-   python scripts/bhoonidhi_s_band.py search --start 2026-06-01 --end 2026-11-02
-   python scripts/bhoonidhi_s_band.py search --start 2026-01-01 --end 2026-02-28 --out data/inventory/nisar_S_gcov_jan_feb.csv
-   ```
-2. Download the first L-band files and shrink them to 20 m. Downloads ran at about 24 MB/s in the cloud session, so each file takes roughly 5 minutes.
+1. Make sure every listed file is on the 20 m grid. To redo them in a fresh session (L-band about 5 min per file, S-band about 25 min):
    ```bash
    python scripts/fetch_nisar_l.py --direction A --dates 2026-06-20 2026-09-12 2026-10-18 --convert --delete-raw
    python scripts/fetch_nisar_l.py --direction D --dates 2026-09-14 --convert --offdiag --delete-raw
+   python scripts/bhoonidhi_s_band.py download --convert --delete-raw --ids \
+       NISAR_S2_PR_GCOV_033_098_A_014_3700_DHNA_A_20261018T233810_20261018T233847_P00500_M_F_I_001 \
+       NISAR_S2_UR_GCOV_030_098_A_014_3700_DHNA_A_20260912T233809_20260912T233846_P00500_N_F_I_001
+   python scripts/bhoonidhi_s_band.py download --convert --offdiag --delete-raw --ids \
+       NISAR_S2_PR_GCOV_030_120_D_076_2500_CRNA_A_20260914T125059_20260914T125135_P00500_M_F_I_001
    ```
-3. Align the supporting layers to the real grid: `python scripts/fetch_ancillary.py --warp-to data/work/L/<granule>_HHHH_20m.tif`.
-4. On the first real file, check these. Run its download without `--delete-raw`, so the `.h5` stays until checked:
-   - The georeferencing assumption: x/yCoordinates are pixel centres. Compare the output against the frame footprint and the preview.
-   - That the EPSG code is read correctly.
-   - The `mask` value codes.
-   - Which covariance terms are present.
-5. Download the S-band GCOV for the matching joint dates. `gcov_to_cog.py` also handles `/science/SSAR`.
-6. Then follow the method and schedule below.
+2. **Decide on 14 Jul (open).** 20 Jun has no S-band, so the only three-way L/S/L+S *gain* pair is 14 Jul → 12 Sep. 14 Jul is the earliest joint date, and the previews show water still low then. It needs L 14 Jul (7 GB raw) plus S 14 Jul (12.6 GB raw): about 3 GB of outputs, but a 12.6 GB raw doesn't fit next to all the other outputs. So either get it before the quad-pol file, or drop the D off-diagonals, or accept that the three-way change test uses only the 12 Sep → 18 Oct loss pair.
+   ```bash
+   python scripts/fetch_nisar_l.py --direction A --dates 2026-07-14 --convert --delete-raw
+   python scripts/bhoonidhi_s_band.py download --convert --delete-raw --ids \
+       NISAR_S2_PR_GCOV_025_098_A_014_3700_DHNA_A_20260714T233811_20260714T233848_P00500_M_F_I_001
+   ```
+3. Check L–S co-registration on 18 Oct (the same joint pass) by cross-correlating S HHHH against L HHHH. Do it separately inside and outside the S-band sample-shift flag. Repeat for 12 Sep: S-band there is urgent-response only, so check its geolocation before using it.
+4. Align the supporting layers to the real grid: `python scripts/fetch_ancillary.py --warp-to data/work/L/<granule>_HHHH_20m.tif`.
+5. Then follow the method and schedule below.
 
 ## Data facts (checked 2 Nov 2026)
 
@@ -59,8 +93,9 @@ Next steps, in order:
 | Joint L+S acquisitions | every pass | quad-pol passes only |
 | BETA (pre-calibration) | 28 Nov, 10 Dec, 22 Dec 2025; 3, 15 Jan 2026 | 30 Nov, 24 Dec 2025; 5, 17 Jan 2026 (quad-pol) |
 | PROVISIONAL (calibrated) | 20 Jun; 2, 14, 26 Jul; 19, 31 Aug; 12, 24 Sep; 6, 18 Oct 2026; 30 Oct (urgent-response version only so far) | quad-pol + joint: 22 Jun, 21 Aug, 2/14/26 Sep. HH/HV L-only: 4, 16 Jul; 8, 20 Oct; 1 Nov (urgent-response) |
+| S-band GCOV on Bhoonidhi (checked 3 Nov) | 37 MHz HH/HV (+ complex HHHV), 10 m, full frame. PROVISIONAL: 14, 26 Jul; 19 Aug; 6, 18 Oct. Urgent-response only: 31 Aug, 12 Sep, 24 Sep, 30 Oct. None before 14 Jul | 25 MHz compact-pol, full frame, PROVISIONAL: 21 Aug; 2, 14, 26 Sep. None for 22 Jun |
 | Overpass | 23:38 UTC = 05:08 IST on the next calendar day | 12:50 UTC = 18:20 IST |
-| File size | about 7 GB | about 7–9 GB |
+| File size | L about 7 GB; S 12.6 GB | L about 7–9 GB |
 
 - Both frames fully contain the 20 km reference box.
 - Each frame covers about 62,000 km² (about 250 × 250 km): the Ganga plain in the north and the Jharkhand plateau (hills, reservoirs) in the south.
@@ -82,16 +117,21 @@ Sources: the ASF NISAR Data User Guide (availability page and PROVISIONAL known 
 6. **L-band dual-pol GCOV has no off-diagonal terms**, so HH/HV data support intensity features only. Full polarimetry is possible only with the descending quad-pol data and S-band compact-pol (check which terms ISRO includes).
 7. **The RFI filter can leave residual interference or remove features in high-contrast areas** (such as water edges). Low-level ripples can also appear over dark areas.
 8. **Use complete products.** Urgent-response products have forecast orbits (L-band); ISRO says S-band urgent-response products may cover a partial swath or a single polarization. Prefer PROVISIONAL or full products.
+   - The S-band 12 Sep (peak) product exists only as urgent-response. Bhoonidhi lists it as full frame and HH/HV, so use it, but check its geolocation against L 12 Sep first.
+9. **S-band "sample shift" flag** (found 3 Nov). `inputDataExceptionMask` = 64 ("NISAR SSAR sample shift") covers 36% of the 18 Oct valid swath. The product doesn't say what it does to the data.
+   - Before fusing, compare L–S co-registration and S radiometry inside vs. outside the flag (it is exported as `*_inputDataExceptionMask_20m.tif`).
+   - If they differ, mask the flagged area or report results separately for it.
 
 ## Scenarios
 
-- **A: S-band exists for the 2026 monsoon.** Run the L vs S vs L+S comparison on ascending joint passes (same time, same geometry). The change pairs are 20 Jun → 12 Sep (gain) and 12 Sep → 18 Oct (loss). Do polarimetry on descending quad-pol + S-band joint passes, starting with 14 Sep (two days after the ascending peak).
+- **A: S-band exists for the 2026 monsoon (confirmed 3 Nov; this is the plan).** Run the L vs S vs L+S comparison on ascending joint passes (same time, same geometry). The change pairs are 20 Jun → 12 Sep (gain) and 12 Sep → 18 Oct (loss). Do polarimetry on descending quad-pol + S-band joint passes, starting with 14 Sep (two days after the ascending peak).
+  - 20 Jun has no S-band. So the gain pair is L-only, unless 14 Jul (the first joint date) is added. See next step 2.
 - **B: S-band only for Jan–Feb 2026.**
   - Run the three-way comparison on 3 and 15 Jan (ascending) and 5 and 17 Jan (descending). This is the dry season: a test of rivers vs sandbars.
   - 3 → 15 Jan doubles as a stable-period false-change test.
   - Monsoon change detection uses L-band only, with the limitation stated. The brief allows this.
 
-### Download priority (L-band)
+### Download priority
 
 | # | File | Why | Size |
 |---|---|---|---|
@@ -99,8 +139,12 @@ Sources: the ASF NISAR Data User Guide (availability page and PROVISIONAL known 
 | 2 | Ascending 2026-09-12 | peak water (from the previews) | 7.0 GB |
 | 3 | Ascending 2026-10-18 | recession | 6.8 GB |
 | 4 | Descending 2026-09-14 (quad-pol, use `--offdiag`) | polarimetry at peak | 8.9 GB |
+| S1 | S-band ascending 2026-10-18 (PROVISIONAL) | joint with #3 | 12.6 GB |
+| S2 | S-band ascending 2026-09-12 (urgent-response only) | joint with #2 | 12.6 GB |
+| S3 | S-band descending 2026-09-14 (compact-pol, use `--offdiag`) | joint with #4 | |
+| open | L + S ascending 2026-07-14 | joint low-water date for a three-way gain pair (next step 2) | 7.0 + 12.6 GB |
 | 5 | Ascending 2026-08-31 and 2026-10-06 | water-area time series (optional) | 7.0 GB each |
-| B | Ascending 2026-01-03 and 2026-01-15; Descending 2026-01-05 and 2026-01-17 | Scenario B only (BETA) | 7–9 GB each |
+| B | Ascending 2026-01-03 and 2026-01-15; Descending 2026-01-05 and 2026-01-17 | Scenario B only (BETA); no S-band exists for these dates | 7–9 GB each |
 
 ## Method
 

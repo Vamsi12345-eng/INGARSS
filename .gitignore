@@ -3,6 +3,7 @@ data/raw/
 data/work/
 data/previews/
 data/ancillary/
+data/logs/
 *.h5
 *.part
 *.tmp.tif
