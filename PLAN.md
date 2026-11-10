@@ -21,7 +21,7 @@ The core question is whether combining L and S (plus the polarimetric channels, 
 - **Deliverables:**
   - `docs/technical_note.md` and `.pdf` (4 pages)
   - figures in `docs/figures/`, numbers in `docs/results/`
-  - slides: https://claude.ai/artifact/P58jpdfijX2SJMPHTCKic1. They are private until shared from the deck's Share menu, and download as .pptx or PDF.
+  - slides: `docs/Drishya_NISAR_presentation.pdf` (and `.pptx`)
 
 Analysis done on the night of 3 Nov:
 - **Plan A:** L and S ascending 14 Jul downloaded and converted. That is the joint low-water date for the three-way *gain* pair 14 Jul → 12 Sep. To make room, five of the six L D 14 Sep off-diagonals were deleted; HHVV was kept, for Pauli and the HH−VV phase.
