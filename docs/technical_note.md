@@ -1,7 +1,7 @@
 ---
 title: "Does L+S beat either band alone? Surface water and its change from NISAR L- and S-band GCOV over the Bihar Ganga floodplain"
 subtitle: "InGARSS 2026 Young Professionals Hackathon, Phase 1 — technical note"
-author: "[team name]"
+author: "Team Drishya"
 date: "November 2026"
 ---
 
