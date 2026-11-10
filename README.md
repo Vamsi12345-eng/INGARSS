@@ -4,7 +4,7 @@ Surface-water mapping and change detection over the Ganga floodplain in Bihar, I
 
 - Technical documentation: [docs/technical_note.pdf](docs/technical_note.pdf) (Word version: [docs/technical_note.docx](docs/technical_note.docx))
 - Presentation: [docs/Drishya_NISAR_presentation.pdf](docs/Drishya_NISAR_presentation.pdf) (PowerPoint: [docs/Drishya_NISAR_presentation.pptx](docs/Drishya_NISAR_presentation.pptx))
-- Code: [scripts/](scripts/) — run order in [scripts/run_analysis.sh](scripts/run_analysis.sh)
+- Code: [scripts_main/](scripts_main/) — step-by-step run guide in [scripts_main/README.md](scripts_main/README.md)
 
 **Result:** against Sentinel-2, the Bayesian L+S water map beats L-band only and S-band only on both validated dates: F1 0.698 vs 0.671 / 0.672 on 18 Oct 2026, and 0.799 vs 0.752 / 0.774 at the 12 Sep peak. The 95% CIs of the gains exclude zero, and an equal-information control (L with about 4× the looks) does worse, so the gain comes from the second frequency.
 
